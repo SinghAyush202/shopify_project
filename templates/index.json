@@ -59,7 +59,7 @@
         "button_H9gpTf"
       ],
       "custom_css": [
-        ".multicolumn {background-image: url(\"https://cdn.shopify.com/s/files/1/0959/9529/8101/files/Rectangle_26167.png?v=1755497687\", \"https://cdn.shopify.com/s/files/1/0959/9529/8101/files/Frame.png?v=1755497701\");}"
+        ".multicolumn {background-image: url(\"https://cdn.shopify.com/s/files/1/0959/9529/8101/files/Rectangle_26167.png?v=1755497687\", \"https://cdn.shopify.com/s/files/1/0959/9529/8101/files/Frame.png?v=1755497701\", \"https://cdn.shopify.com/s/files/1/0959/9529/8101/files/Frame_1.png?v=1755497712\");}"
       ],
       "name": "t:names.hero",
       "settings": {
