@@ -1,6 +1,458 @@
+{% doc %}
+  @prompt
+    the output should be seen as there should be 3 section one upper half in which we have to add a image and in lower half there should be 2 part and right should have image and lefty should have content and a button
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-three-section-layout-{{ ai_gen_id }} {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.section_spacing }}px;
+  }
+
+  .ai-three-section-upper-{{ ai_gen_id }} {
+    width: 100%;
+    position: relative;
+  }
+
+  .ai-three-section-upper-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.upper_image_height }}px;
+    object-fit: cover;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-three-section-upper-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.upper_image_height }}px;
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.border_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-three-section-upper-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+    opacity: 0.3;
+  }
+
+  .ai-three-section-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #666;
+    font-size: 14px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-three-section-lower-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ block.settings.lower_section_gap }}px;
+    align-items: center;
+  }
+
+  .ai-three-section-content-{{ ai_gen_id }} {
+    padding: {{ block.settings.content_padding }}px;
+    background-color: {{ block.settings.content_background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ai-three-section-heading-{{ ai_gen_id }} {
+    color: {{ block.settings.heading_color }};
+    font-size: {{ block.settings.heading_size }}px;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .ai-three-section-text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .ai-three-section-button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: {{ block.settings.button_padding_vertical }}px {{ block.settings.button_padding_horizontal }}px;
+    background-color: {{ block.settings.button_background_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: {{ block.settings.button_text_size }}px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+  }
+
+  .ai-three-section-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_color }};
+  }
+
+  .ai-three-section-lower-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.lower_image_height }}px;
+    object-fit: cover;
+    border-radius: {{ block.settings.border_radius }}px;
+  }
+
+  .ai-three-section-lower-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: {{ block.settings.lower_image_height }}px;
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.border_radius }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-three-section-lower-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 150px;
+    max-height: 150px;
+    opacity: 0.3;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-three-section-lower-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: {{ block.settings.mobile_section_gap }}px;
+    }
+
+    .ai-three-section-upper-image-{{ ai_gen_id }},
+    .ai-three-section-upper-placeholder-{{ ai_gen_id }} {
+      height: {{ block.settings.upper_image_height | times: 0.7 }}px;
+    }
+
+    .ai-three-section-lower-image-{{ ai_gen_id }},
+    .ai-three-section-lower-placeholder-{{ ai_gen_id }} {
+      height: {{ block.settings.lower_image_height | times: 0.8 }}px;
+    }
+
+    {% if block.settings.mobile_content_first %}
+      .ai-three-section-content-{{ ai_gen_id }} {
+        order: 1;
+      }
+      .ai-three-section-lower-image-wrapper-{{ ai_gen_id }} {
+        order: 2;
+      }
+    {% endif %}
+  }
+{% endstyle %}
+
+<div class="ai-three-section-layout-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-three-section-upper-{{ ai_gen_id }}">
+    {% if block.settings.upper_image %}
+      <img
+        src="{{ block.settings.upper_image | image_url: width: 1200 }}"
+        alt="{{ block.settings.upper_image.alt | escape }}"
+        class="ai-three-section-upper-image-{{ ai_gen_id }}"loading="lazy"
+        width="{{ block.settings.upper_image.width }}"
+        height="{{ block.settings.upper_image.height }}"
+      >
+    {% else %}
+      <div class="ai-three-section-upper-placeholder-{{ ai_gen_id }}">
+        {{ 'hero-apparel-1' | placeholder_svg_tag }}<div class="ai-three-section-empty-state-{{ ai_gen_id }}">
+          Add an image for the upper section
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="ai-three-section-lower-{{ ai_gen_id }}">
+    <div class="ai-three-section-content-{{ ai_gen_id }}">
+      {% if block.settings.heading != blank %}
+        <h2 class="ai-three-section-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+      {% endif %}
+      
+      {% if block.settings.text != blank %}
+        <div class="ai-three-section-text-{{ ai_gen_id }}">{{ block.settings.text }}</div>
+      {% endif %}
+      
+      {% if block.settings.button_text != blank and block.settings.button_link != blank %}
+        <a href="{{ block.settings.button_link }}" class="ai-three-section-button-{{ ai_gen_id }}">
+          {{ block.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+
+    <div class="ai-three-section-lower-image-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.lower_image %}
+        <img
+          src="{{ block.settings.lower_image | image_url: width: 800 }}"
+          alt="{{ block.settings.lower_image.alt | escape }}"
+          class="ai-three-section-lower-image-{{ ai_gen_id }}"
+          loading="lazy"
+          width="{{ block.settings.lower_image.width }}"
+          height="{{ block.settings.lower_image.height }}"
+        >
+      {% else %}
+        <div class="ai-three-section-lower-placeholder-{{ ai_gen_id }}">
+          {{ 'image' | placeholder_svg_tag }}
+          <div class="ai-three-section-empty-state-{{ ai_gen_id }}">
+            Add an image for the lower section
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Three section layout",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Upper section"
+    },
+    {
+      "type": "image_picker",
+      "id": "upper_image",
+      "label": "Upper image"
+    },
+    {
+      "type": "range",
+      "id": "upper_image_height",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Upper image height",
+      "default": 400
+    },
+    {
+      "type": "header",
+      "content": "Lower section content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Your heading here"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>Add your content description here. This text will appear in the left side of the lower section.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Lower section image"
+    },
+    {
+      "type": "image_picker",
+      "id": "lower_image",
+      "label": "Lower image"
+    },
+    {
+      "type": "range",
+      "id": "lower_image_height",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "unit": "px",
+      "label": "Lower image height",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_spacing",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Spacing between sections",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "lower_section_gap",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Gap between content and image",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "mobile_section_gap",
+      "min": 16,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Mobile gap",
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_content_first",
+      "label": "Show content first on mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Content styling"
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 20,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Content padding",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "content_background_color",
+      "label": "Content background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 18,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Button styling"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_text_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Button text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_padding_vertical",
+      "min": 8,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Button vertical padding",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "button_padding_horizontal",
+      "min": 16,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "label": "Button horizontal padding",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Three section layout"
+    }
+  ]
+}
 {% endschema %}
