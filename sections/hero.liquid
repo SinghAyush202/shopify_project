@@ -1,4 +1,7 @@
-
+{% comment %}
+Modified Hero Section Template
+Save this as sections/hero.liquid
+{% endcomment %}
 
 {% liquid
   assign media_count = 0
@@ -21,6 +24,7 @@
   assign has_media = false
   assign media_type_1 = section.settings.media_type_1
   assign media_type_2 = section.settings.media_type_2
+  
   if section.settings.image_1 != blank and media_type_1 == 'image'
     assign has_image_1 = true
   endif
@@ -54,9 +58,16 @@
   endif
 
   assign fetch_priority = 'auto'
-
   if section.index == 1
     assign fetch_priority = 'high'
+  endif
+
+  comment
+    Check if this is the gift guide section
+  endcomment
+  assign is_gift_guide = false
+  if section.settings.gift_guide_layout == true
+    assign is_gift_guide = true
   endif
 %}
 
@@ -159,41 +170,9 @@
   {%- endif -%}
 {% endcapture %}
 
-{% capture media_blurred %}
-  {% if has_image_1 %}
-    {{
-      section.settings.image_1
-      | image_url: width: 3840
-      | image_tag:
-        width: section.settings.image_1.width,
-        widths: widths,
-        height: section.settings.image_1.height,
-        alt: '',
-        class: 'hero__image',
-        sizes: sizes
-    }}
-  {% endif %}
-  {% if has_image_2 %}
-    {{
-      section.settings.image_2
-      | image_url: width: 3840
-      | image_tag:
-        width: section.settings.image_2.width,
-        widths: widths,
-        height: section.settings.image_2.height,
-        alt: '',
-        class: 'hero__image',
-        sizes: sizes
-    }}
-  {% endif %}
-  {% if has_media == false and is_transparent %}
-    {{ 'hero-apparel-1' | placeholder_svg_tag: 'hero__image' }}
-  {% endif %}
-{% endcapture %}
-
 <div
   id="Hero-{{ section.id }}"
-  class="hero color-{{ section.settings.color_scheme }}{% if section.blocks.size == 0 and section.settings.section_height == 'auto' %} hero--no-blocks-auto-height{% endif %}"
+  class="hero color-{{ section.settings.color_scheme }}{% if section.blocks.size == 0 and section.settings.section_height == 'auto' %} hero--no-blocks-auto-height{% endif %}{% if is_gift_guide %} hero--gift-guide{% endif %}"
   style="
     --hero-border-style: {{ section.settings.border }};
     --hero-border-width: {{ section.settings.border_width }}px;
@@ -210,64 +189,103 @@
   {% if request.visual_preview_mode %}
     data-shopify-visual-preview
   {% endif %}
-  {% if section.settings.blurred_reflection and has_video_multiple == false %}
-    data-blur-shadow="true"
-  {% endif %}
 >
-  {% if section.settings.blurred_reflection %}
-    {% unless has_video_multiple or is_transparent == false %}
-      <div class="hero__blurred-image">
-        {{ media_blurred }}
-      </div>
-    {% endunless %}
-  {% endif %}
-
   {% comment %}
-    Hardcoded to section--full-width bc the media has to be full width in all cases.
-    hero__content-wrapper applies section_width.
+    Gift Guide Layout
   {% endcomment %}
-
-  <div
-    class="hero__container spacing-style section section--full-width"
-    style="      {% render 'spacing-style', settings: section.settings %}"
-  >
-    {%- if section.settings.link != blank -%}
-      <a
-        href="{{ section.settings.link }}"
-        class="hero__link"
-        {% if section.settings.open_in_new_tab %}
-          target="_blank" rel="noopener"
-        {% endif %}
-      ></a>
-    {%- endif -%}
+  {% if is_gift_guide %}
+    <div class="hero__gift-guide-container">
+      <!-- Header -->
+      <div class="hero__gift-guide-header">
+        <div class="hero__brand">TISSO VISON</div>
+        <div class="hero__tagline">Find the ideal gift for your loved ones.</div>
+        <div class="hero__choose-gift">
+          <span>CHOOSE GIFT</span>
+          <span class="hero__arrow">→</span>
+        </div>
+      </div>
+      
+      <!-- Top Frame - Full Width -->
+      <div class="hero__top-section">
+        <img src="{{ 'Frame_1.png' | asset_url }}" alt="Gift Items Frame 1" class="hero__top-frame-image">
+      </div>
+      
+      <!-- Bottom Section - Split Layout -->
+      <div class="hero__bottom-section">
+        <!-- Left Side - Gift Guide Content -->
+        <div class="hero__content-area">
+          <div class="hero__content-text">
+            <h1 class="hero__title">The Gift Guide</h1>
+            <div class="hero__description">
+              <p><strong>Discover Joy:</strong></p>
+              <p>Your Ultimate Holiday Gift Destination.</p>
+              <p>Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>
+              
+              <a href="http://127.0.0.1:9292/collections/all" class="hero__shop-button">SHOP NOW →</a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Side - Bottom Frame -->
+        <div class="hero__image-area">
+          <img src="{{ 'Frame.png' | asset_url }}" alt="Gift Items Frame 2" class="hero__bottom-frame-image">
+        </div>
+      </div>
+      
+      <!-- Bottom Text -->
+      <div class="hero__bottom-text">
+        SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL
+      </div>
+    </div>
+  {% else %}
+    {% comment %}
+      Default Hero Layout
+    {% endcomment %}
     <div
-      class="hero__media-wrapper"
-      {%- if section.settings.image_1 != blank -%}
-        style="--hero-media-aspect-ratio: {{ section.settings.image_1.aspect_ratio }}; --hero-media-count: {{ media_count }};"
+      class="hero__container spacing-style section section--full-width"
+      style="{% render 'spacing-style', settings: section.settings %}"
+    >
+      {%- if section.settings.link != blank -%}
+        <a
+          href="{{ section.settings.link }}"
+          class="hero__link"
+          {% if section.settings.open_in_new_tab %}
+            target="_blank" rel="noopener"
+          {% endif %}
+        ></a>
       {%- endif -%}
-    >
-      {% liquid
-        if section.settings.toggle_overlay
-          render 'overlay', settings: section.settings
-        endif
-      %}
-      {{ media }}
+      
+      <div
+        class="hero__media-wrapper"
+        {%- if section.settings.image_1 != blank -%}
+          style="--hero-media-aspect-ratio: {{ section.settings.image_1.aspect_ratio }}; --hero-media-count: {{ media_count }};"
+        {%- endif -%}
+      >
+        {% liquid
+          if section.settings.toggle_overlay
+            render 'overlay', settings: section.settings
+          endif
+        %}
+        {{ media }}
+      </div>
+      
+      <div
+        class="
+          hero__content-wrapper
+          layout-panel-flex
+          layout-panel-flex--{{ section.settings.content_direction }}
+          {% if section.settings.vertical_on_mobile %}mobile-column{% endif %}
+          section-content-wrapper
+          {{section.settings.section_width}}
+          {% if request.design_mode %}hero__content-wrapper--design-mode{% endif %}
+        "
+        style="{% render 'layout-panel-style', settings: section.settings %}"
+      >
+        {% content_for 'blocks' %}
+      </div>
+      
     </div>
-    <div
-      class="
-        hero__content-wrapper
-        layout-panel-flex
-        layout-panel-flex--{{ section.settings.content_direction }}
-        {% if section.settings.vertical_on_mobile %}mobile-column{% endif %}
-        section-content-wrapper
-        {{section.settings.section_width}}
-        {% if request.design_mode %}hero__content-wrapper--design-mode{% endif %}
-      "
-      style="{% render 'layout-panel-style', settings: section.settings %}"
-    >
-      {% content_for 'blocks' %}
-    </div>
-  </div>
+  {% endif %}
 </div>
 
 {% stylesheet %}
@@ -289,7 +307,6 @@
 
   .hero[data-shopify-visual-preview] {
     --hero-min-height: 600px;
-
     min-height: 600px;
   }
 
@@ -307,6 +324,256 @@
     }
   }
 
+  /* Gift Guide Specific Styles */
+  .hero--gift-guide {
+    background: white;
+    min-height: 700px;
+    overflow: hidden;
+  }
+
+  .hero__gift-guide-container {
+    position: relative;
+    width: 100%;
+    min-height: 700px;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* Header Section */
+  .hero__gift-guide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: white;
+    z-index: 10;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .hero__brand {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #000;
+    letter-spacing: 1px;
+  }
+
+  .hero__tagline {
+    font-size: 0.9rem;
+    color: #666;
+    flex: 1;
+    text-align: center;
+  }
+
+  .hero__choose-gift {
+    background: #FFD700;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .hero__arrow {
+    font-size: 1.2rem;
+  }
+
+  /* Top Section - Compact Frame */
+  .hero__top-section {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    flex-shrink: 0;
+    padding: 10px;
+    max-width: 1200px;
+  }
+
+  .hero__top-frame-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Bottom Section - Split Layout */
+  .hero__bottom-section {
+    display: flex;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 1200px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  /* Left Content Area */
+  .hero__content-area {
+    flex: 0 0 400px;
+    padding: 30px 20px 30px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: white;
+  }
+
+  .hero__content-text {
+    max-width: 320px;
+    width: 100%;
+    text-align: left;
+    margin-right: 10px;
+  }
+
+  .hero__title {
+    font-size: 2.2rem !important;
+    font-weight: bold !important;
+    color: #000 !important;
+    margin-bottom: 15px !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.5px;
+  }
+
+  .hero__description {
+    margin-bottom: 20px;
+  }
+
+  .hero__description p {
+    font-size: 0.95rem !important;
+    color: #333 !important;
+    line-height: 1.4 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .hero__description p:first-child {
+    margin-bottom: 4px !important;
+  }
+
+  .hero__description p:last-child {
+    margin-bottom: 20px !important;
+  }
+
+  .hero__shop-button {
+    background: #000;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 4px;
+    display: inline-block;
+    transition: background 0.3s ease;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .hero__shop-button:hover {
+    background: #333;
+    color: white;
+  }
+
+  /* Right Image Area */
+  .hero__image-area {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-left: 1px solid #e0e0e0;
+    padding: 20px;
+  }
+
+  .hero__bottom-frame-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+  }
+
+  /* Bottom Text */
+  .hero__bottom-text {
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    padding: 15px 20px;
+    flex-shrink: 0;
+    background: white;
+    width: 100%;
+    max-width: 1200px;
+    margin-top: 20px;
+  }
+
+  /* Mobile Responsiveness */
+  @media screen and (max-width: 768px) {
+    .hero__gift-guide-header {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      padding: 15px 20px;
+    }
+
+    .hero__top-section {
+      height: 150px;
+    }
+
+    .hero__bottom-section {
+      flex-direction: column;
+    }
+
+    .hero__content-area,
+    .hero__image-area {
+      flex: none;
+      width: 100%;
+    }
+
+    .hero__content-area {
+      padding: 30px 20px;
+    }
+
+    .hero__image-area {
+      min-height: 200px;
+      border-left: none;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .hero__title {
+      font-size: 2rem !important;
+    }
+
+    .hero__tagline {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .hero__content-area {
+      padding: 20px 15px;
+    }
+
+    .hero__title {
+      font-size: 1.8rem !important;
+    }
+
+    .hero__top-section {
+      height: 120px;
+    }
+  }
+
+  /* Default Hero Styles (existing styles) */
   .hero__content-wrapper.page-width {
     grid-column: 2 / 3;
   }
@@ -341,7 +608,6 @@
     }
 
     .hero__media-wrapper {
-      /* When there are no blocks and the height is auto, allow the image to appear. */
       position: relative;
     }
   }
@@ -380,63 +646,6 @@
   .hero__content-wrapper--design-mode * {
     pointer-events: auto;
   }
-
-  .hero[data-blur-shadow='true'] {
-    --blurred-reflection-filter-saturate: saturate(1.5);
-    --blurred-reflection-mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
-    --blurred-reflection-box-shadow: rgb(0 0 0 / 5%) 0 0 1rem;
-    --blurred-reflection-filter-blur: blur(20px);
-    --blurred-reflection-scale: scale(2, 1.25);
-    --blurred-reflection-padding-block-end: 60px;
-  }
-
-  .hero[data-blur-shadow='true'] .hero__container {
-    overflow: inherit;
-  }
-
-  .hero[data-blur-shadow='true'] .hero__container::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    box-shadow: var(--blurred-reflection-box-shadow);
-    mix-blend-mode: overlay;
-    pointer-events: none;
-    z-index: -1;
-  }
-
-  .hero__blurred-image {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    mask-image: var(--blurred-reflection-mask-image);
-    filter: var(--blurred-reflection-filter-saturate);
-    pointer-events: none;
-    transform: translateY(50%);
-    overflow: hidden;
-  }
-
-  .hero__blurred-image img,
-  .hero__blurred-image svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
-    filter: var(--blurred-reflection-filter-blur);
-    opacity: var(--blur-opacity);
-    transform: var(--blurred-reflection-scale);
-    padding-block-end: var(--blurred-reflection-padding-block-end);
-
-    &:not(:only-child) {
-      width: 50%;
-
-      &:last-child {
-        right: 0;
-        left: auto;
-      }
-    }
-  }
 {% endstylesheet %}
 
 {% schema %}
@@ -474,6 +683,17 @@
     "groups": ["header"]
   },
   "settings": [
+    {
+      "type": "header",
+      "content": "Layout Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "gift_guide_layout",
+      "label": "Enable Gift Guide Layout",
+      "default": false,
+      "info": "Use special layout with Frame.png and Frame_1.png assets"
+    },
     {
       "type": "header",
       "content": "t:content.media"
@@ -825,6 +1045,56 @@
     },
     {
       "type": "header",
+      "content": "t:content.border"
+    },
+    {
+      "type": "select",
+      "id": "border",
+      "label": "t:settings.border_style",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.none"
+        },
+        {
+          "value": "solid",
+          "label": "t:options.solid"
+        },
+        {
+          "value": "dashed",
+          "label": "t:options.dashed"
+        },
+        {
+          "value": "dotted",
+          "label": "t:options.dotted"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "t:settings.border_width",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "label": "t:settings.border_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "visible_if": "{{ section.settings.border != 'none' }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding"
     },
     {
@@ -850,10 +1120,40 @@
   ],
   "presets": [
     {
+      "name": "Gift Guide Hero",
+      "category": "t:categories.banners",
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "<h1>The Gift Guide</h1>"
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>"
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "label": "SHOP NOW",
+            "link": "shopify://collections/all"
+          }
+        }
+      ],
+      "settings": {
+        "gift_guide_layout": true,
+        "section_height": "medium",
+        "color_scheme": "scheme-1"
+      }
+    },
+    {
       "name": "t:names.hero",
       "category": "t:categories.banners",
-      "blocks": {
-        "text_1": {
+      "blocks": [
+        {
           "type": "text",
           "settings": {
             "text": "<h1>New arrivals</h1>",
@@ -861,7 +1161,7 @@
             "max_width": "narrow"
           }
         },
-        "text_2": {
+        {
           "type": "text",
           "settings": {
             "text": "<p>Made with care and unconditionally loved by our customers.</p>",
@@ -869,7 +1169,7 @@
             "padding-block-end": 32
           }
         },
-        "button": {
+        {
           "type": "button",
           "name": "t:names.button",
           "settings": {
@@ -877,8 +1177,7 @@
             "link": "shopify://collections/all"
           }
         }
-      },
-      "block_order": ["text_1", "text_2", "button"],
+      ],
       "settings": {
         "horizontal_alignment_flex_direction_column": "center",
         "gap": 16,
@@ -893,36 +1192,34 @@
     {
       "name": "t:names.hero_marquee",
       "category": "t:categories.banners",
-      "blocks": {
-        "spacer": {
+      "blocks": [
+        {
           "type": "spacer",
           "settings": {
             "size": "pixel",
             "pixel_size": 24
           }
         },
-        "marquee": {
+        {
           "type": "_marquee",
-          "blocks": {
-            "text": {
+          "blocks": [
+            {
               "type": "text",
               "settings": {
                 "text": "<p>Explore our latest products.</p>",
                 "type_preset": "h1"
               }
             }
-          },
-          "block_order": ["text"]
+          ]
         },
-        "button": {
+        {
           "type": "button",
           "settings": {
             "label": "Shop Now",
             "link": "shopify://collections/all"
           }
         }
-      },
-      "block_order": ["spacer", "marquee", "button"],
+      ],
       "settings": {
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "space-between",

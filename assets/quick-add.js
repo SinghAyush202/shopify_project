@@ -53,18 +53,22 @@ export class QuickAddComponent extends Component {
   }
 
   /**
-   * Handles quick add button click
+   * Handles quick add button click (the "+" button)
    * @param {Event} event - The click event
    */
   handleClick = async (event) => {
     event.preventDefault();
 
+    console.log('Quick add button clicked'); // Debug log
+
     const currentUrl = this.productPageUrl;
+    console.log('Product URL:', currentUrl); // Debug log
 
     // Check if we have cached content for this URL
     let productGrid = this.#cachedContent.get(currentUrl);
 
     if (!productGrid) {
+      console.log('Fetching product page content...'); // Debug log
       // Fetch and cache the content
       const html = await this.fetchProductPage(currentUrl);
       if (html) {
@@ -73,8 +77,13 @@ export class QuickAddComponent extends Component {
           // Cache the cloned element to avoid modifying the original
           productGrid = /** @type {Element} */ (gridElement.cloneNode(true));
           this.#cachedContent.set(currentUrl, productGrid);
+          console.log('Product content cached'); // Debug log
+        } else {
+          console.log('No product grid element found'); // Debug log
         }
       }
+    } else {
+      console.log('Using cached product content'); // Debug log
     }
 
     if (productGrid) {
@@ -102,6 +111,7 @@ export class QuickAddComponent extends Component {
     this.#stayVisibleUntilDialogCloses(dialogComponent);
 
     dialogComponent.showDialog();
+    console.log('Quick add modal opened'); // Debug log
   };
 
   #closeQuickAddModal = () => {
@@ -140,6 +150,7 @@ export class QuickAddComponent extends Component {
       if (error.name === 'AbortError') {
         return null;
       } else {
+        console.error('Error fetching product page:', error);
         throw error;
       }
     } finally {
@@ -148,40 +159,135 @@ export class QuickAddComponent extends Component {
   }
 
   /**
-   * Re-renders the variant picker.
+   * Re-renders the variant picker and includes product description.
    * @param {Element} productGrid - The product grid element
    */
   async updateQuickAddModal(productGrid) {
     const modalContent = document.getElementById('quick-add-modal-content');
 
-    if (!productGrid || !modalContent) return;
+    if (!productGrid || !modalContent) {
+      console.log('Missing productGrid or modalContent'); // Debug log
+      return;
+    }
+
+    console.log('Updating quick add modal...'); // Debug log
+
+    // Multiple selectors to find product description
+    const descriptionSelectors = [
+      '.product-description',
+      '.rte',
+      '[data-product-description]',
+      '.product__description',
+      '.product-single__description',
+      '.product-content .rte',
+      '.product__content .rte',
+      '.product-details .rte',
+      '.product-information .rte',
+      '.description',
+      '.product-desc'
+    ];
+
+    let productDescription = null;
+    
+    // Try each selector until we find a description
+    for (const selector of descriptionSelectors) {
+      productDescription = productGrid.querySelector(selector);
+      if (productDescription && productDescription.textContent.trim()) {
+        console.log(`Found description with selector: ${selector}`); // Debug log
+        break;
+      }
+    }
+
+    if (!productDescription) {
+      console.log('No product description found in any of the selectors'); // Debug log
+      console.log('Available elements in productGrid:', [...productGrid.querySelectorAll('*')].map(el => el.className).filter(Boolean)); // Debug log
+    } else {
+      console.log('Description content:', productDescription.textContent.substring(0, 100) + '...'); // Debug log
+    }
 
     if (isMobileBreakpoint()) {
+      console.log('Mobile breakpoint detected'); // Debug log
+      
       const productDetails = productGrid.querySelector('.product-details');
-      if (!productDetails) return;
+      if (!productDetails) {
+        console.log('No product details found'); // Debug log
+        return;
+      }
+      
       const productFormComponent = productGrid.querySelector('product-form-component');
       const variantPicker = productGrid.querySelector('variant-picker');
       const productPrice = productGrid.querySelector('product-price');
+      
       const productTitle = document.createElement('a');
       productTitle.textContent = this.dataset.productTitle || '';
-
-      // Make product title as a link to the product page
       productTitle.href = this.productPageUrl;
 
-      if (!productFormComponent || !variantPicker || !productPrice || !productTitle) return;
+      if (!productFormComponent || !variantPicker || !productPrice || !productTitle) {
+        console.log('Missing required components for mobile view'); // Debug log
+        return;
+      }
 
       const productHeader = document.createElement('div');
       productHeader.classList.add('product-header');
 
       productHeader.appendChild(productTitle);
       productHeader.appendChild(productPrice);
+      
+      // Add description if it exists
+      if (productDescription) {
+        const descriptionClone = productDescription.cloneNode(true);
+        // Ensure it has the right classes for styling
+        descriptionClone.classList.add('product-description', 'quick-add-description');
+        descriptionClone.setAttribute('data-quick-add-content', 'true');
+        
+        // Create a wrapper for better styling
+        const descriptionWrapper = document.createElement('div');
+        descriptionWrapper.classList.add('quick-add-description-wrapper');
+        descriptionWrapper.appendChild(descriptionClone);
+        
+        productHeader.appendChild(descriptionWrapper);
+        console.log('Added description to mobile view'); // Debug log
+      } else {
+        console.log('No description to add to mobile view'); // Debug log
+      }
+      
       productGrid.appendChild(productHeader);
       productGrid.appendChild(variantPicker);
       productGrid.appendChild(productFormComponent);
       productDetails.remove();
+    } else {
+      console.log('Desktop breakpoint detected'); // Debug log
+      
+      // For desktop, ensure description is preserved and visible
+      if (productDescription) {
+        // Make sure the description has the right classes to bypass CSS hiding
+        productDescription.classList.add('product-description', 'quick-add-description');
+        productDescription.setAttribute('data-quick-add-content', 'true');
+        
+        // Also try to find the parent container and mark it
+        const parentContainer = productDescription.closest('.group-block, .product-details, .rte');
+        if (parentContainer) {
+          parentContainer.classList.add('has-description');
+          parentContainer.setAttribute('data-contains-description', 'true');
+        }
+        
+        console.log('Prepared description for desktop view'); // Debug log
+      } else {
+        console.log('No description found for desktop view'); // Debug log
+      }
     }
 
     morph(modalContent, productGrid);
+
+    // After morphing, let's verify the description is there
+    setTimeout(() => {
+      const descriptionInModal = modalContent.querySelector('.product-description, .quick-add-description, [data-quick-add-content]');
+      if (descriptionInModal) {
+        console.log('Description successfully added to modal'); // Debug log
+      } else {
+        console.log('Description NOT found in modal after morphing'); // Debug log
+      }
+    }, 100);
 
     this.#syncVariantSelection(modalContent);
   }
@@ -253,10 +359,7 @@ class QuickAddDialog extends DialogComponent {
 
   #handleDialogClose = () => {
     const iosVersion = getIOSVersion();
-    /**
-     * This is a patch to solve an issue with the UI freezing when the dialog is closed.
-     * To reproduce it, use iOS 16.0.
-     */
+   
     if (!iosVersion || iosVersion.major >= 17 || (iosVersion.major === 16 && iosVersion.minor >= 4)) return;
 
     requestAnimationFrame(() => {

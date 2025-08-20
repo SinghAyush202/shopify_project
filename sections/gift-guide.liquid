@@ -1,0 +1,85 @@
+{% schema %}
+{
+  "name": "Gift Guide",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "top_image",
+      "label": "Top Full-Width Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "left_image",
+      "label": "Bottom Left Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The Gift Guide"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Subtext",
+      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "SHOP NOW"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gift Guide Section"
+    }
+  ]
+}
+{% endschema %}
+
+<section class="gift-guide">
+
+  <!-- TOP FULL-WIDTH IMAGE -->
+  {% if section.settings.top_image != blank %}
+    <div class="gift-guide__top">
+      <img src="{{ section.settings.top_image | image_url: 'master' }}" alt="Gift Guide Top" style="width: 100%; display: block;">
+    </div>
+  {% else %}
+    <div class="gift-guide__top">
+      <img src="{{ 'Frame.png' | asset_url }}" alt="Gift Guide Top" style="width: 100%; display: block;">
+    </div>
+  {% endif %}
+
+  <!-- BOTTOM SPLIT -->
+  <div class="gift-guide__bottom" style="max-width: 1200px; margin: 60px auto; display: flex; align-items: center; gap: 40px; padding: 0 20px;">
+
+    <!-- LEFT IMAGE -->
+    <div class="gift-guide__left" style="flex: 1;">
+      {% if section.settings.left_image != blank %}
+        <img src="{{ section.settings.left_image | image_url: 'master' }}" alt="Gift Guide Left" style="width: 100%; border-radius: 8px;">
+      {% else %}
+        <img src="{{ 'Frame (1).png' | asset_url }}" alt="Gift Guide Left" style="width: 100%; border-radius: 8px;">
+      {% endif %}
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div class="gift-guide__right" style="flex: 1; text-align: left;">
+      <h2 style="font-size: 42px; font-weight: bold; margin-bottom: 20px;">{{ section.settings.heading }}</h2>
+      <p style="font-size: 18px; margin-bottom: 30px; line-height: 1.6;">{{ section.settings.subtext }}</p>
+
+      {% if section.settings.button_label != blank and section.settings.button_link != blank %}
+        <a href="{{ section.settings.button_link }}" class="gift-guide__btn" style="display: inline-block; background: #000; color: #fff; padding: 14px 30px; border-radius: 6px; font-weight: 600; text-decoration: none; transition: background 0.3s;">
+          {{ section.settings.button_label }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
