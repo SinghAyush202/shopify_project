@@ -14,39 +14,41 @@
     "175570831377c54a50": {
       "type": "_blocks",
       "blocks": {
-        "ai_gen_block_30074f0_jT6kqF": {
-          "type": "ai_gen_block_30074f0",
+        "ai_gen_block_4299863_mxpR3H": {
+          "type": "ai_gen_block_4299863",
           "settings": {
             "upper_image": "shopify://shop_images/Frame_1.png",
-            "upper_image_height": 240,
-            "heading": "The Gift Guid",
-            "text": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
+            "upper_image_height": 260,
+            "heading": "The Gift Guide",
+            "text": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season</p>",
             "button_text": "Shop Now -->",
             "button_link": "shopify://collections/all",
             "lower_image": "shopify://shop_images/Frame.png",
             "lower_image_height": 200,
-            "section_padding": 40,
             "section_spacing": 40,
-            "content_padding": 30,
+            "lower_section_gap": 40,
+            "mobile_section_gap": 24,
+            "mobile_content_first": true,
             "border_radius": 8,
-            "background_color": "#ffffff",
-            "content_background_color": "#f8f8f8",
+            "content_padding": 32,
+            "content_background_color": "#ffffff",
             "heading_color": "#000000",
-            "text_color": "#666666",
-            "button_color": "#000000",
-            "button_text_color": "#ffffff",
-            "button_hover_color": "#333333",
-            "button_hover_text_color": "#ffffff",
             "heading_size": 32,
+            "text_color": "#666666",
             "text_size": 16,
+            "button_background_color": "#000000",
+            "button_hover_color": "#333333",
+            "button_text_color": "#ffffff",
             "button_text_size": 14,
+            "button_padding_vertical": 12,
+            "button_padding_horizontal": 24,
             "button_border_radius": 6
           },
           "blocks": {}
         }
       },
       "block_order": [
-        "ai_gen_block_30074f0_jT6kqF"
+        "ai_gen_block_4299863_mxpR3H"
       ],
       "settings": {
         "content_direction": "column",
@@ -74,36 +76,6 @@
         "gradient_direction": "to top",
         "padding-block-start": 0,
         "padding-block-end": 0
-      }
-    },
-    "header_announcements_9jGBFp": {
-      "type": "header-announcements",
-      "blocks": {
-        "announcement_BxgCk9": {
-          "type": "_announcement",
-          "settings": {
-            "text": "Welcome to our store",
-            "link": "",
-            "font": "var(--font-subheading--family)",
-            "font_size": "0.75rem",
-            "weight": "",
-            "letter_spacing": "normal",
-            "case": "none"
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "announcement_BxgCk9"
-      ],
-      "name": "t:names.announcement_bar",
-      "settings": {
-        "speed": 5,
-        "section_width": "page-width",
-        "color_scheme": "scheme-1",
-        "divider_width": 1,
-        "padding-block-start": 15,
-        "padding-block-end": 15
       }
     },
     "header_section": {
@@ -152,6 +124,7 @@
           "blocks": {}
         }
       },
+      "disabled": true,
       "settings": {
         "logo_position": "left",
         "menu_position": "left",
@@ -186,7 +159,6 @@
   },
   "order": [
     "175570831377c54a50",
-    "header_announcements_9jGBFp",
     "header_section"
   ]
 }
